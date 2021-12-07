@@ -1,4 +1,5 @@
 from fastai.vision.all import *
+from matplotlib.pyplot import thetagrids
 # fastai is an api build on top of pytorch and i will be learning it along the way with 
 # pytorch through this project and the following ones
 
@@ -31,3 +32,19 @@ print(im_array)
 # tensor is the pytorch version of a numpy array
 im_tensor = tensor(im3)[4:10,4:10]
 print(im_tensor)
+
+# loop over the lest of 7s and 3s, openning the image, trun it into a tensor and then return the list
+seven_tensors = [tensor(Image.open(o)) for o in sevens]
+three_tensors = [tensor(Image.open(o)) for o in threes]
+print(len(three_tensors),len(seven_tensors))
+
+# show_image(three_tensors[1])
+# the show_iamge command is in the fastai lib and we can display tensors as images with it
+three_shape = three_tensors[1].shape
+print(three_shape) # its a tensor of shape torch.Size([28, 28])
+
+three_type = type(three_tensors) 
+print(three_type) # its a list
+
+# because three_type is a list, we can't do heavy mathematically heavy computations on it
+# so what we can do is we can stack all the 3s on top of each others to form a tensor with x dimensions
