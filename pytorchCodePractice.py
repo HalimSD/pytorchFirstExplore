@@ -112,3 +112,58 @@ accuracy_3s = is_3(valid_3_tens).float().mean()
 accuracy_7s = is_3(valid_7_tens).float().mean()
 
 
+# USING GRADIENT DESCENT
+def f(x): return x**2
+xt = tensor(3.).requires_grad_() # the _ at the end is an inplace operation which tells pytorch to keep track of it
+yt = f(xt) # yt returns tensor(9., grad_fn=<PowBackward0>)
+yt.backward() # backward()is the back propagation which means take the derivative
+xt.grad # we find the gradient after we kept track of the derivative using the requires_grad_() 
+# the derivative of x**2 is 2x wich means xt.grad will return tensor(6.). the derivative is the slope at some point
+# the gradient is the slope of the functions. it tells us if we change the input, how will the output change
+
+
+# An End-to-End SGD Example
+time = torch.arange(0,20).float()
+speed = torch.randn(20)*3 + 0.75*(time-9.5)**2 + 1
+def f(t, params):
+    a,b,c = params
+    return a*(t**2) + (b*t) + c
+def mse(preds, targets): return ((preds-targets)**2).mean().sqrt()
+
+# Step 1: Initialize the parameters
+params = torch.randn(3).requires_grad_() # 3 for a,b and c random values for the parameters, we track the gradience to adjust them later
+
+
+# Step 2: Calculate the predictions
+preds = f(time, params)
+
+# Step 3: Calculate the loss
+loss = mse(preds, speed)
+
+# Step 4: Calculate the gradients
+loss.backward()
+params.grad
+params.grad * 1e-5
+
+# Step 5: Step the weights
+lr = 1e-5
+params.data -= lr * params.grad.data
+params.grad = None
+preds = f(time,params)
+mse(preds, speed)
+
+# Step 6: Repeat the process
+def apply_step(params, prn=True):
+    preds = f(time, params)
+    loss = mse(preds, speed)
+    loss.backward()
+    params.data -= lr * params.grad.data
+    params.grad = None
+    if prn: print(loss.item())
+    return preds
+
+for i in range(10): apply_step(params)
+params = orig_params.detach().requires_grad_()
+
+# Step 7: stop
+
