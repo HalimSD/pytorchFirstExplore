@@ -128,11 +128,11 @@ speed = torch.randn(20)*3 + 0.75*(time-9.5)**2 + 1
 def f(t, params):
     a,b,c = params
     return a*(t**2) + (b*t) + c
-def mse(preds, targets): return ((preds-targets)**2).mean().sqrt()
+
+def mse(preds, targets): return ((preds-targets)**2).mean().sqrt() # we'll use it to calculate the loss
 
 # Step 1: Initialize the parameters
 params = torch.randn(3).requires_grad_() # 3 for a,b and c random values for the parameters, we track the gradience to adjust them later
-
 
 # Step 2: Calculate the predictions
 preds = f(time, params)
@@ -147,8 +147,8 @@ params.grad * 1e-5
 
 # Step 5: Step the weights
 lr = 1e-5
-params.data -= lr * params.grad.data
-params.grad = None
+params.data -= lr * params.grad.data # when using the .data from pytorch then the gradient isn't calculated
+params.grad = None # we don't want to calculate the gradient of the actual learning step we taking but on the function f
 preds = f(time,params)
 mse(preds, speed)
 
@@ -163,7 +163,10 @@ def apply_step(params, prn=True):
     return preds
 
 for i in range(10): apply_step(params)
-params = orig_params.detach().requires_grad_()
 
 # Step 7: stop
 
+# note: we can't use the metric as the loss if that metric has a gradient of 0
+# thats why the loss function and the metric are not always the same thing
+# that's because if the loss is too small that means the gradient for the parameters is too small
+# so if one pixel changed by tiny bit, the loss is changed but the metric could still have the same value 7 is still a 7 even if a pixel changed
