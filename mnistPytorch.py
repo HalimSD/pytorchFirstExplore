@@ -122,7 +122,33 @@ validate_epoch(linear1)
 linear_model = nn.Linear(28*28,1)
 
 
+# Adding nonlinearity:
+w1 = init_params((28*28,30))
+b1 = init_params(30)
+w2 = init_params((30,1))
+b2 = init_params(1)
 
+# this simple net is just 2 linear functions and a .max between them that'll turn any negative number into 0
+def simple_net(xb): 
+    res = xb@w1 + b1
+    # the relu, rectified linear unit
+    res = res.max(tensor(0.0))
+    res = res@w2 + b2
+    return res
+
+# DataLoaders is a fastai object to pass it the training and validation datasets
+dls = DataLoaders(dl, valid_dl)
+
+simple_net = nn.Sequential(
+    nn.Linear(28*28,30),
+    nn.ReLU(),
+    nn.Linear(30,1)
+)
+
+learn = Learner(dls, simple_net, opt_func=SGD,
+                loss_func=mnist_loss, metrics=batch_accuracy)
+
+learn.fit(40, 0.1)
 
 
 
