@@ -1,5 +1,4 @@
 from fastai.vision.all import *
-from matplotlib.pyplot import thetagrids
 # fastai is an api build on top of pytorch and i will be learning it along the way with
 # pytorch through this project and the following ones
 
